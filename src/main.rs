@@ -1,6 +1,6 @@
 use cipher::Cipher;
 use rand::{seq::SliceRandom, Rng};
-use std::io::BufRead;
+use std::{cmp, io::BufRead};
 
 mod cipher;
 mod diff;
@@ -38,32 +38,35 @@ fn main() {
 
     loop {
         println!();
-        println!("-- TEXT ALPHABET --");
+        for i in 1..=cmp::max(text_alphabet.chars().count(), key_alphabet.chars().count()) {
+            print!("{:02} ", i);
+        }
+        println!();
         print_alphabet(text_alphabet);
-        println!("-- KEY ALPHABET --");
         print_alphabet(key_alphabet);
         println!();
-        println!("encoded text:\t'{}'", encoded);
-        println!("enter your guess: ");
+        println!("> encoded text:\t'{}'", encoded);
+        println!("> enter your guess: ");
         let mut guess = String::new();
         std::io::stdin()
             .read_line(&mut guess)
             .expect("Failed to read guess!");
-        let decoded = cipher.decode(&encoded, &guess.trim_end());
-        println!("decoded text:\t'{}'", decoded);
-        if decoded == text {
-            println!("GOOD JOB!");
-            break;
+        let guess = guess.trim_end();
+        if guess.chars().all(|it| key_alphabet.contains(it)) {
+            let decoded = cipher.decode(&encoded, &guess);
+            println!("> decoded text:\t'{}'", decoded);
+            if decoded == text {
+                println!("> GOOD JOB!");
+                break;
+            }
+            println!("> progress: {:.1}%", 100.0 * diff::diff(&decoded, &text));
+        } else {
+            println!("> error: invalid string");
         }
-        println!("Decoded: {:.1}%", 100.0 * diff::diff(&decoded, &text));
     }
 }
 
 fn print_alphabet(s: &str) {
-    println!("\t{} ", s);
-    print!("\t");
-    for i in 1..=s.chars().count() {
-        print!("{} ", i);
-    }
+    s.chars().for_each(|it| print!("{:02} ", it));
     println!();
 }
