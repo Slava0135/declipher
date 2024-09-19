@@ -5,6 +5,7 @@ pub struct Cipher<'a> {
 }
 
 impl Cipher<'_> {
+
     pub fn encode(self, text: &str, key: &str) -> String {
         assert!(text.chars().all(|it| self.text_alphabet.contains(it)));
         assert!(key.chars().all(|it| self.key_alphabet.contains(it)));
@@ -25,6 +26,28 @@ impl Cipher<'_> {
         }
         return result;
     }
+
+    pub fn decode(self, text: &str, key: &str) -> String {
+        assert!(text.chars().all(|it| self.text_alphabet.contains(it)));
+        assert!(key.chars().all(|it| self.key_alphabet.contains(it)));
+        if key.is_empty() {
+            return String::from(text);
+        }
+        let mut result = String::new();
+        let mut index = 0;
+        let key_len = key.chars().count();
+        let text_alphabet_len = self.text_alphabet.chars().count();
+        for text_ch in text.chars() {
+            let text_index = str::find(self.text_alphabet, text_ch).unwrap();
+            let key_ch = key.chars().nth(index % key_len).unwrap();
+            let key_index = str::find(self.key_alphabet, key_ch).unwrap();
+            let combined_index = (text_alphabet_len + text_index - (key_index + 1)) % text_alphabet_len;
+            result.push(self.text_alphabet.chars().nth(combined_index).unwrap());
+            index += 1;
+        }
+        return result;
+    }
+
 }
 
 mod tests {
@@ -63,4 +86,18 @@ mod tests {
         assert_eq!("baa", DEFAULT_CIPHER.encode(text, "de"));
         assert_eq!("bac", DEFAULT_CIPHER.encode(text, "def"));
     }
+
+    #[test]
+    fn encode_decode() {
+        let text_cases = ["a", "b", "bbb", "bababac", "cacacbbbaabb"];
+        let keys = ["d", "dd", "feed", "def", "fdedededfffedd"];
+        for text in text_cases {
+            for key in keys {
+                let encoded = DEFAULT_CIPHER.encode(text, key);
+                let decoded = DEFAULT_CIPHER.decode(&encoded, key);
+                assert_eq!(text, decoded);
+            }
+        }
+    }
+
 }
