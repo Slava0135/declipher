@@ -55,7 +55,7 @@ fn main() {
             println!("GOOD JOB!");
             break;
         }
-        println!("Decoded: {:.1}%", diff::diff(&decoded, &text));
+        println!("Decoded: {:.1}%", 100.0 * diff::diff(&decoded, &text));
     }
 }
 
