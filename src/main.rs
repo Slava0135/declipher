@@ -25,14 +25,23 @@ fn main() {
 
     let length = rng.gen_range(20..=30);
     let text_alphabet_len = text_alphabet.chars().count();
-    let text: String = (0..length)
-        .map(|_| {
-            text_alphabet
+    let mut text = String::new();
+    let mut chars_without_space = 0;
+    for _ in 0..length {
+        if chars_without_space > 0 && rng.gen_bool(chars_without_space as f64 / 16.0) || chars_without_space >= 8 {
+            text.push(' ');
+            chars_without_space = 0;
+        } else {
+            let next = text_alphabet
                 .chars()
                 .nth(rng.gen_range(0..text_alphabet_len))
-                .unwrap()
-        })
-        .collect();
+                .unwrap();
+            text.push(next);
+            chars_without_space += 1;
+        }
+    }
+
+    let text = text;
     let key = words.choose(&mut rng).expect("No words to pick from!");
     let encoded = cipher.encode(&text, key);
 
