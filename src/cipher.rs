@@ -11,10 +11,19 @@ impl Cipher<'_> {
         if key.is_empty() {
             return String::from(text);
         }
-        let text_index = str::find(self.text_alphabet, text.chars().nth(0).unwrap()).unwrap();
-        let key_index = str::find(self.key_alphabet, key.chars().nth(0).unwrap()).unwrap();
-        let combined_index = (text_index + key_index + 1) % self.text_alphabet.chars().count();
-        return String::from(self.text_alphabet.chars().nth(combined_index).unwrap());
+        let mut result = String::new();
+        let mut index = 0;
+        let key_len = key.chars().count();
+        let text_alphabet_len = self.text_alphabet.chars().count();
+        for text_ch in text.chars() {
+            let text_index = str::find(self.text_alphabet, text_ch).unwrap();
+            let key_ch = key.chars().nth(index % key_len).unwrap();
+            let key_index = str::find(self.key_alphabet, key_ch).unwrap();
+            let combined_index = (text_index + key_index + 1) % text_alphabet_len;
+            result.push(self.text_alphabet.chars().nth(combined_index).unwrap());
+            index += 1;
+        }
+        return result;
     }
 }
 
@@ -45,5 +54,13 @@ mod tests {
         assert_eq!("b", DEFAULT_CIPHER.encode("a", "d"));
         assert_eq!("c", DEFAULT_CIPHER.encode("a", "e"));
         assert_eq!("a", DEFAULT_CIPHER.encode("a", "f"));
+    }
+
+    #[test]
+    fn encode_many() {
+        let text = "abc";
+        assert_eq!("bca", DEFAULT_CIPHER.encode(text, "d"));
+        assert_eq!("baa", DEFAULT_CIPHER.encode(text, "de"));
+        assert_eq!("bac", DEFAULT_CIPHER.encode(text, "def"));
     }
 }
