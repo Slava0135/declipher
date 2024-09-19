@@ -5,14 +5,14 @@ pub struct Cipher<'a> {
 }
 
 impl Cipher<'_> {
-    pub fn encode(self, text: &str, key: &str) -> String {
+    pub fn encode(&self, text: &str, key: &str) -> String {
         fn go(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize {
             (text_index + key_index + 1) % text_alphabet_len
         }
         return self.common(text, key, go);
     }
 
-    pub fn decode(self, text: &str, key: &str) -> String {
+    pub fn decode(&self, text: &str, key: &str) -> String {
         fn go(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize {
             (text_alphabet_len + text_index - (key_index + 1)) % text_alphabet_len
         }
@@ -20,7 +20,7 @@ impl Cipher<'_> {
     }
 
     fn common(
-        self,
+        &self,
         text: &str,
         key: &str,
         transform: fn(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize,
