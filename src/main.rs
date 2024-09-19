@@ -17,7 +17,7 @@ fn main() {
 
     let mut rng = rand::thread_rng();
     let key_alphabet = "abcdefghijklmnopqrstuvwxyz";
-    let text_alphabet = "abcdefghijklmnopqrstuvwxyz";
+    let text_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let cipher = Cipher {
         key_alphabet: &key_alphabet,
         text_alphabet: &text_alphabet,
