@@ -37,24 +37,25 @@ fn main() {
     let encoded = cipher.encode(&text, key);
 
     loop {
+        println!();
         println!("-- TEXT ALPHABET --");
         print_alphabet(text_alphabet);
         println!("-- KEY ALPHABET --");
         print_alphabet(key_alphabet);
         println!();
-        println!("encoded text: '{}'", encoded);
-
+        println!("encoded text:\t'{}'", encoded);
         println!("enter your guess: ");
         let mut guess = String::new();
         std::io::stdin()
             .read_line(&mut guess)
             .expect("Failed to read guess!");
-        let decoded = cipher.decode(&encoded, &guess);
+        let decoded = cipher.decode(&encoded, &guess.trim_end());
+        println!("decoded text:\t'{}'", decoded);
         if decoded == text {
             println!("GOOD JOB!");
             break;
         }
-        println!("{:.1}", diff::diff(&decoded, &text));
+        println!("Decoded: {:.1}%", diff::diff(&decoded, &text));
     }
 }
 
