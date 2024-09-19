@@ -61,6 +61,11 @@ fn main() {
             .read_line(&mut guess)
             .expect("Failed to read guess!");
         let guess = guess.trim_end();
+        if guess.is_empty() {
+            println!("> the key was: {}", key);
+            println!("> the text was: '{}'", text);
+            break;
+        }
         if guess.chars().all(|it| key_alphabet.contains(it)) {
             let decoded = cipher.decode(&encoded, &guess);
             println!("> decoded text:\t'{}'", decoded);
