@@ -5,7 +5,6 @@ pub struct Cipher<'a> {
 }
 
 impl Cipher<'_> {
-
     pub fn encode(self, text: &str, key: &str) -> String {
         fn go(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize {
             (text_index + key_index + 1) % text_alphabet_len
@@ -20,9 +19,18 @@ impl Cipher<'_> {
         return self.common(text, key, go);
     }
 
-    fn common(self, text: &str, key: &str, transform: fn(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize) -> String {
-        assert!(text.chars().all(|it| it.is_whitespace() || self.text_alphabet.contains(it)));
-        assert!(key.chars().all(|it| it.is_whitespace() || self.key_alphabet.contains(it)));
+    fn common(
+        self,
+        text: &str,
+        key: &str,
+        transform: fn(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize,
+    ) -> String {
+        assert!(text
+            .chars()
+            .all(|it| it.is_whitespace() || self.text_alphabet.contains(it)));
+        assert!(key
+            .chars()
+            .all(|it| it.is_whitespace() || self.key_alphabet.contains(it)));
         if key.is_empty() {
             return String::from(text);
         }
@@ -44,13 +52,15 @@ impl Cipher<'_> {
         }
         return result;
     }
-
 }
 
 mod tests {
     use super::*;
 
-    const DEFAULT_CIPHER: Cipher<'_> = Cipher{text_alphabet: "abc", key_alphabet: "def"};
+    const DEFAULT_CIPHER: Cipher<'_> = Cipher {
+        text_alphabet: "abc",
+        key_alphabet: "def",
+    };
 
     #[test]
     #[should_panic]
@@ -101,5 +111,4 @@ mod tests {
             }
         }
     }
-
 }
