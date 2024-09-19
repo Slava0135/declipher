@@ -7,27 +7,20 @@ pub struct Cipher<'a> {
 impl Cipher<'_> {
 
     pub fn encode(self, text: &str, key: &str) -> String {
-        assert!(text.chars().all(|it| self.text_alphabet.contains(it)));
-        assert!(key.chars().all(|it| self.key_alphabet.contains(it)));
-        if key.is_empty() {
-            return String::from(text);
+        fn go(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize {
+            (text_index + key_index + 1) % text_alphabet_len
         }
-        let mut result = String::new();
-        let mut index = 0;
-        let key_len = key.chars().count();
-        let text_alphabet_len = self.text_alphabet.chars().count();
-        for text_ch in text.chars() {
-            let text_index = str::find(self.text_alphabet, text_ch).unwrap();
-            let key_ch = key.chars().nth(index % key_len).unwrap();
-            let key_index = str::find(self.key_alphabet, key_ch).unwrap();
-            let combined_index = (text_index + key_index + 1) % text_alphabet_len;
-            result.push(self.text_alphabet.chars().nth(combined_index).unwrap());
-            index += 1;
-        }
-        return result;
+        return self.common(text, key, go);
     }
 
     pub fn decode(self, text: &str, key: &str) -> String {
+        fn go(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize {
+            (text_alphabet_len + text_index - (key_index + 1)) % text_alphabet_len
+        }
+        return self.common(text, key, go);
+    }
+
+    fn common(self, text: &str, key: &str, transform: fn(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize) -> String {
         assert!(text.chars().all(|it| self.text_alphabet.contains(it)));
         assert!(key.chars().all(|it| self.key_alphabet.contains(it)));
         if key.is_empty() {
@@ -41,7 +34,7 @@ impl Cipher<'_> {
             let text_index = str::find(self.text_alphabet, text_ch).unwrap();
             let key_ch = key.chars().nth(index % key_len).unwrap();
             let key_index = str::find(self.key_alphabet, key_ch).unwrap();
-            let combined_index = (text_alphabet_len + text_index - (key_index + 1)) % text_alphabet_len;
+            let combined_index = transform(text_index, key_index, text_alphabet_len);
             result.push(self.text_alphabet.chars().nth(combined_index).unwrap());
             index += 1;
         }
