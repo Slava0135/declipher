@@ -21,8 +21,8 @@ impl Cipher<'_> {
     }
 
     fn common(self, text: &str, key: &str, transform: fn(text_index: usize, key_index: usize, text_alphabet_len: usize) -> usize) -> String {
-        assert!(text.chars().all(|it| self.text_alphabet.contains(it)));
-        assert!(key.chars().all(|it| self.key_alphabet.contains(it)));
+        assert!(text.chars().all(|it| it.is_whitespace() || self.text_alphabet.contains(it)));
+        assert!(key.chars().all(|it| it.is_whitespace() || self.key_alphabet.contains(it)));
         if key.is_empty() {
             return String::from(text);
         }
@@ -31,11 +31,15 @@ impl Cipher<'_> {
         let key_len = key.chars().count();
         let text_alphabet_len = self.text_alphabet.chars().count();
         for text_ch in text.chars() {
-            let text_index = str::find(self.text_alphabet, text_ch).unwrap();
-            let key_ch = key.chars().nth(index % key_len).unwrap();
-            let key_index = str::find(self.key_alphabet, key_ch).unwrap();
-            let combined_index = transform(text_index, key_index, text_alphabet_len);
-            result.push(self.text_alphabet.chars().nth(combined_index).unwrap());
+            if text_ch.is_whitespace() {
+                result.push(text_ch);
+            } else {
+                let text_index = str::find(self.text_alphabet, text_ch).unwrap();
+                let key_ch = key.chars().nth(index % key_len).unwrap();
+                let key_index = str::find(self.key_alphabet, key_ch).unwrap();
+                let combined_index = transform(text_index, key_index, text_alphabet_len);
+                result.push(self.text_alphabet.chars().nth(combined_index).unwrap());
+            }
             index += 1;
         }
         return result;
@@ -78,6 +82,11 @@ mod tests {
         assert_eq!("bca", DEFAULT_CIPHER.encode(text, "d"));
         assert_eq!("baa", DEFAULT_CIPHER.encode(text, "de"));
         assert_eq!("bac", DEFAULT_CIPHER.encode(text, "def"));
+    }
+
+    #[test]
+    fn encode_ignore_spaces() {
+        assert_eq!("bca  bca bca", DEFAULT_CIPHER.encode("abc  abc abc", "d"))
     }
 
     #[test]
