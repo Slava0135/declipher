@@ -1,7 +1,7 @@
 #[derive(Debug)]
 pub struct Cipher<'a> {
-    text_alphabet: &'a str,
-    key_alphabet: &'a str,
+    pub text_alphabet: &'a str,
+    pub key_alphabet: &'a str,
 }
 
 impl Cipher<'_> {
@@ -54,6 +54,7 @@ impl Cipher<'_> {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
