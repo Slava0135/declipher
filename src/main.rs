@@ -28,7 +28,9 @@ fn main() {
     let mut text = String::new();
     let mut chars_without_space = 0;
     for _ in 0..length {
-        if chars_without_space > 0 && rng.gen_bool(chars_without_space as f64 / 16.0) || chars_without_space >= 8 {
+        if chars_without_space > 0 && rng.gen_bool(chars_without_space as f64 / 16.0)
+            || chars_without_space >= 8
+        {
             text.push(' ');
             chars_without_space = 0;
         } else {
